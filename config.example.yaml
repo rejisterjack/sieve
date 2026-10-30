@@ -1,0 +1,15 @@
+# Risk levels: safe | suspicious | blocked
+# Inputs at or above block_on are rejected by the sidecar.
+block_on: blocked
+include_input: false
+disable_builtin: false
+log_path: sieve.log
+# Optional webhook fired when an input is blocked.
+# webhook_url: https://hooks.example.com/sieve
+listen_addr: ":8080"
+
+# Domain-specific rules appended to the built-in library.
+rules:
+  # - category: company_secret
+  #   pattern: '\binternal-only\b'
+  #   risk: blocked
