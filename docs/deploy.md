@@ -22,6 +22,13 @@ railway up
 railway domain
 ```
 
+### Ops note (2026-10-31)
+
+Creating a new Railway project under the free plan may fail with
+`Free plan resource provision limit exceeded`. Upgrade the Railway plan or free
+capacity before `railway init` / `railway up`. Until then, run the demo locally
+with `make run`.
+
 ## Custom domain `sieve.rejisterjack.com`
 
 1. In Railway → service → Settings → Networking → Custom Domain, add `sieve.rejisterjack.com`.
