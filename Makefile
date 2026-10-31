@@ -1,4 +1,4 @@
-.PHONY: test vet build run
+.PHONY: test vet build run bench logs
 
 test:
 	go test ./...
@@ -11,4 +11,10 @@ build:
 	go build -o bin/sieve ./cmd/sieve
 
 run:
-	go run ./cmd/sieve -config config.example.yaml
+	go run ./cmd/sieve serve -config config.demo.yaml
+
+bench:
+	go test -bench=BenchmarkScan -benchmem ./...
+
+logs:
+	go run ./cmd/sieve logs -path sieve.log -summary

@@ -1,0 +1,8 @@
+# Demo sidecar config for Railway / local demo UI.
+block_on: blocked
+include_input: false
+disable_builtin: false
+log_path: sieve.log
+listen_addr: ":8080"
+
+rules: []

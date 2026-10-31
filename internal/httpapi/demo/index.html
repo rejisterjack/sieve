@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sieve — prompt injection filter</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --fg: #e7ecf1;
+      --muted: #8b98a5;
+      --accent: #3d9a6a;
+      --danger: #c45c5c;
+      --warn: #c9a227;
+      --panel: #1a222c;
+      --line: #2a3540;
+      --font: "IBM Plex Sans", "Segoe UI", sans-serif;
+      --mono: "IBM Plex Mono", ui-monospace, monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+    header {
+      padding: 2.5rem 1.5rem 1rem;
+      max-width: 52rem;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: 2rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin: 0 0 0.5rem;
+    }
+    .tagline { color: var(--muted); margin: 0 0 1rem; max-width: 36rem; }
+    main { max-width: 52rem; margin: 0 auto; padding: 0 1.5rem 3rem; }
+    .examples { display: grid; gap: 0.5rem; margin: 1.5rem 0; }
+    button.ex {
+      text-align: left;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      color: var(--fg);
+      padding: 0.85rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font: inherit;
+    }
+    button.ex:hover { border-color: var(--accent); }
+    button.ex .id { font-family: var(--mono); font-size: 0.8rem; color: var(--accent); }
+    button.ex .preview { color: var(--muted); font-size: 0.9rem; margin-top: 0.25rem; }
+    .risk {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      margin-left: 0.5rem;
+    }
+    .risk.blocked { background: color-mix(in srgb, var(--danger) 25%, transparent); color: #f0a0a0; }
+    .risk.suspicious { background: color-mix(in srgb, var(--warn) 25%, transparent); color: #e8d48a; }
+    .risk.safe { background: color-mix(in srgb, var(--accent) 25%, transparent); color: #8fd4ae; }
+    #result {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 1rem;
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      white-space: pre-wrap;
+      min-height: 6rem;
+    }
+    footer { color: var(--muted); font-size: 0.85rem; margin-top: 2rem; }
+    a { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Sieve</h1>
+    <p class="tagline">Agents trust what they read. Sieve makes sure what they read is trustworthy.</p>
+    <p class="tagline">Try a synthetic injection example — including a scraped page with hidden instructions.</p>
+  </header>
+  <main>
+    <div class="examples" id="examples">Loading examples…</div>
+    <h2 style="font-size:1rem;font-weight:600;margin:1.5rem 0 0.5rem;">Scan result</h2>
+    <div id="result">Select an example above.</div>
+    <footer>
+      Library + HTTP sidecar · <a href="https://github.com/rejisterjack/sieve">github.com/rejisterjack/sieve</a>
+      · Pair with <a href="https://github.com/rejisterjack/keywarden">Keywarden</a>
+      · <a href="/healthz">/healthz</a>
+    </footer>
+  </main>
+  <script>
+    const examplesEl = document.getElementById("examples");
+    const resultEl = document.getElementById("result");
+
+    async function load() {
+      const res = await fetch("/v1/examples");
+      const data = await res.json();
+      examplesEl.innerHTML = "";
+      for (const ex of data.examples || []) {
+        const btn = document.createElement("button");
+        btn.className = "ex";
+        btn.type = "button";
+        btn.innerHTML =
+          '<div><span class="id">' + ex.id + '</span>' +
+          '<span class="risk ' + ex.expect + '">' + ex.expect + '</span></div>' +
+          '<div class="preview">' + escapeHtml(ex.preview) + '</div>';
+        btn.onclick = () => scan(ex.id);
+        examplesEl.appendChild(btn);
+      }
+    }
+
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    async function scan(id) {
+      resultEl.textContent = "Scanning…";
+      const res = await fetch("/v1/examples/" + encodeURIComponent(id) + "/scan", { method: "POST" });
+      const data = await res.json();
+      resultEl.textContent = JSON.stringify(data, null, 2);
+    }
+
+    load().catch((e) => {
+      examplesEl.textContent = "Failed to load examples: " + e;
+    });
+  </script>
+</body>
+</html>
