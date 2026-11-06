@@ -12,6 +12,8 @@ Contextual and persuasive attacks that do **not** match known patterns can get t
 
 Treat Sieve as one control among several (model-side policies, least-privilege tools, human review), not as a guarantee.
 
+**Won't-build (closed):** ML / embedding-based / contextual multi-turn detection stays out of scope. Sieve remains pattern/regex defence-in-depth.
+
 ## False positives
 
 Legitimate user messages can look like injections (“ignore the previous paragraph and summarize the next one”). Tune `block_on`, add domain-specific allow/deny rules in YAML, and review the structured flag log (`sieve logs`) before tightening thresholds in production.
