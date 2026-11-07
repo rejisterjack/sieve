@@ -32,9 +32,16 @@ with `make run`.
 
 ## Custom domain `sieve.rejisterjack.com`
 
-1. In Railway → service → Settings → Networking → Custom Domain, add `sieve.rejisterjack.com`.
-2. At your DNS host, create the record Railway shows (usually CNAME to `*.up.railway.app`, or A/ALIAS as instructed).
-3. Wait for TLS provisioning.
+Railway’s free plan may refuse custom domains. When DNS for `rejisterjack.com`
+already lives on Vercel (wildcard `*`), put a rewrite in front of the Railway
+URL the same way Tock does:
+
+1. Deploy the Go sidecar on Railway (Dockerfile / `railway.toml`) and note the
+   `*.up.railway.app` service domain.
+2. Point `edge/vercel.json` at that Railway URL, then deploy the `edge/`
+   directory as a Vercel project (`rootDirectory=edge`).
+3. Attach `sieve.rejisterjack.com` as an alias on that edge project (removes the
+   dead `DEPLOYMENT_NOT_FOUND` wildcard hit).
 4. Verify:
 
    ```bash
@@ -42,4 +49,8 @@ with `make run`.
    curl -sf https://sieve.rejisterjack.com/ | head
    ```
 
-Both should return HTTP 200.
+Both should return HTTP 200. The edge project only rewrites — it does not host
+the Go binary.
+
+If your Railway plan allows custom domains, you can skip the edge proxy and
+attach `sieve.rejisterjack.com` directly in Railway networking instead.
