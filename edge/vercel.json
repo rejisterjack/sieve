@@ -3,7 +3,7 @@
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "https://sieve-production-accc.up.railway.app/$1"
+      "destination": "https://sieve-ih2z.onrender.com/$1"
     }
   ]
 }
