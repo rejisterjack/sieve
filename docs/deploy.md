@@ -9,48 +9,29 @@ curl -sf localhost:8080/healthz
 curl -sf localhost:8080/v1/examples | head
 ```
 
-## Railway
+## Render (public demo)
 
-1. Create a Railway project/service from this repo (Dockerfile build via `railway.toml`).
-2. The image entrypoint runs `sieve serve -config /config.demo.yaml`. The process
-   binds `0.0.0.0:$PORT` when Railway sets `PORT` (local default remains `:8080`).
-3. Health check path: `/healthz`.
-4. Attach a public domain (Railway-generated or custom).
+The live host [sieve.rejisterjack.com](https://sieve.rejisterjack.com) runs on Render
+(`Dockerfile` → free Web Service). The process binds `0.0.0.0:$PORT` when Render
+sets `PORT` (local default remains `:8080`). Health check path: `/healthz`.
+
+1. Create a Render Web Service from this repo (Docker runtime, `./Dockerfile`).
+2. Note the `*.onrender.com` URL (e.g. `https://sieve-ih2z.onrender.com`).
+3. Either attach `sieve.rejisterjack.com` as a Render custom domain, **or** (when
+   DNS for `rejisterjack.com` already lives on Vercel) deploy `edge/` as a
+   Vercel rewrite to that Render URL and alias the custom domain there — same
+   pattern as Tock.
 
 ```bash
-railway init   # or link an existing project
-railway up
-railway domain
+curl -sf https://sieve.rejisterjack.com/healthz
+curl -sf https://sieve.rejisterjack.com/ | head
 ```
 
-### Ops note (2026-10-31)
+Free Render instances sleep after ~15 minutes idle; the first request after
+sleep can be slow.
 
-Creating a new Railway project under the free plan may fail with
-`Free plan resource provision limit exceeded`. Upgrade the Railway plan or free
-capacity before `railway init` / `railway up`. Until then, run the demo locally
-with `make run`.
+## Railway (optional)
 
-## Custom domain `sieve.rejisterjack.com`
-
-Railway’s free plan may refuse custom domains. When DNS for `rejisterjack.com`
-already lives on Vercel (wildcard `*`), put a rewrite in front of the Railway
-URL the same way Tock does:
-
-1. Deploy the Go sidecar on Railway (Dockerfile / `railway.toml`) and note the
-   `*.up.railway.app` service domain.
-2. Point `edge/vercel.json` at that Railway URL, then deploy the `edge/`
-   directory as a Vercel project (`rootDirectory=edge`).
-3. Attach `sieve.rejisterjack.com` as an alias on that edge project (removes the
-   dead `DEPLOYMENT_NOT_FOUND` wildcard hit).
-4. Verify:
-
-   ```bash
-   curl -sf https://sieve.rejisterjack.com/healthz
-   curl -sf https://sieve.rejisterjack.com/ | head
-   ```
-
-Both should return HTTP 200. The edge project only rewrites — it does not host
-the Go binary.
-
-If your Railway plan allows custom domains, you can skip the edge proxy and
-attach `sieve.rejisterjack.com` directly in Railway networking instead.
+Railway also works for the same Dockerfile (`railway.toml`). Free-plan limits may
+block new projects or custom domains; prefer Render for the public demo unless
+you already have Railway capacity.
