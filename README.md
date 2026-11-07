@@ -8,6 +8,10 @@ Prompt injection filter for AI agents.
 
 ![Demo: scraped-page injection blocked](docs/demo.gif)
 
+## Public demo
+
+The live host [sieve.rejisterjack.com](https://sieve.rejisterjack.com) runs the embedded examples UI against **synthetic fixtures** only (Tock-style locked walkthrough). Classification via `POST /v1/scan` is available but stores nothing durable — Railway’s filesystem is ephemeral. Self-host (`go install` or a Release binary) for real agent traffic.
+
 ## Install
 
 ```bash

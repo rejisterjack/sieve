@@ -12,7 +12,8 @@ curl -sf localhost:8080/v1/examples | head
 ## Railway
 
 1. Create a Railway project/service from this repo (Dockerfile build via `railway.toml`).
-2. The image entrypoint runs `sieve serve -config /config.demo.yaml` on `:8080`.
+2. The image entrypoint runs `sieve serve -config /config.demo.yaml`. The process
+   binds `0.0.0.0:$PORT` when Railway sets `PORT` (local default remains `:8080`).
 3. Health check path: `/healthz`.
 4. Attach a public domain (Railway-generated or custom).
 

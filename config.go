@@ -3,6 +3,7 @@ package sieve
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 )
@@ -35,9 +36,7 @@ func LoadFile(path string) (FileConfig, error) {
 	if err := yaml.Unmarshal(data, &cfg); err != nil {
 		return FileConfig{}, fmt.Errorf("parse config: %w", err)
 	}
-	if cfg.ListenAddr == "" {
-		cfg.ListenAddr = ":8080"
-	}
+	cfg.ListenAddr = resolveListenAddr(cfg.ListenAddr)
 	if cfg.BlockOn == "" {
 		cfg.BlockOn = string(RiskBlocked)
 	}
@@ -45,6 +44,21 @@ func LoadFile(path string) (FileConfig, error) {
 		cfg.LogPath = "sieve.log"
 	}
 	return cfg, nil
+}
+
+// resolveListenAddr prefers Railway/Heroku-style $PORT when set, otherwise
+// the YAML listen_addr, otherwise :8080. Always binds on all interfaces.
+func resolveListenAddr(configured string) string {
+	if port := strings.TrimSpace(os.Getenv("PORT")); port != "" {
+		if strings.HasPrefix(port, ":") {
+			return "0.0.0.0" + port
+		}
+		return "0.0.0.0:" + port
+	}
+	if configured == "" {
+		return ":8080"
+	}
+	return configured
 }
 
 // ToConfig converts file config into a runtime Config.
