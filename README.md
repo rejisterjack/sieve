@@ -73,4 +73,12 @@ See [`config.example.yaml`](config.example.yaml) for thresholds, custom rules, l
 
 ## Status
 
-Library (16+ builtin categories), YAML config, HTTP sidecar with demo UI, structured flag log + `logs` CLI, middleware/`Guard`, benchmarks, and CI/release workflows are in place. Detection remains pattern-based — see [LIMITATIONS.md](LIMITATIONS.md). Pair with [Keywarden](https://github.com/rejisterjack/keywarden) for tool/credential control.
+Library (16+ builtin categories), YAML config, HTTP sidecar with demo UI, structured flag log + `logs` CLI, middleware/`Guard`, and benchmarks are in place.
+
+## CI/CD
+
+Workflows run only on a push to `main`. A pull request, any other branch, a tag push, a schedule, and a manual run do not start CI or CD. The only deploy target is production. Connect Render, Railway, and the Vercel rewrite to `main` and leave preview and pull-request deploys off.
+
+A production publish runs on that same push when the commit subject starts with `release: v` and a version (`release: v1.2.3`). That publish attaches sidecar binaries to a GitHub Release. Any other push to `main` runs checks only. Pushing a tag does not start a workflow.
+
+Detection remains pattern-based — see [LIMITATIONS.md](LIMITATIONS.md). Pair with [Keywarden](https://github.com/rejisterjack/keywarden) for tool/credential control.

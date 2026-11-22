@@ -1,5 +1,7 @@
 # Deploy Sieve
 
+CI and CD run only on a push to `main`. Connect Render, Railway, and the Vercel rewrite to `main`. Preview and pull-request deploys stay off. The Vercel project builds only when the git ref is `main`, and that build is production.
+
 ## Local demo
 
 ```bash
